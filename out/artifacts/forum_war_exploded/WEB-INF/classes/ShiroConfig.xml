@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="userRealm" class="com.hao.forum.service.realm.UserRealm">
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <property name="hashAlgorithmName" value="MD5"></property>
+                <property name="hashIterations" value="1024"></property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+        <property name="authenticationStrategy">
+            <bean class="org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy"></bean>
+        </property>
+    </bean>
+    <!--1. 配置 SecurityManager!-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="authenticator" ref="authenticator"></property>
+
+        <property name="realms">
+            <list>
+                <ref bean="userRealm"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--&lt;!&ndash; Spring配置文件的核心点（数据源、与mybatis的整合，事务控制） &ndash;&gt;-->
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login.jsp"/>
+        <property name="successUrl" value="/index"/>
+        <property name="unauthorizedUrl" value="/403.html"/>
+
+        <property name="filterChainDefinitions">
+            <value>
+                / = anon
+                /login.jsp = anon
+                /user/login = anon
+                /user/logout = logout
+                /register.jsp = anon
+                /user/register = anon
+                /static/** = anon
+                /admin/** = authc,roles[admin]
+                /index = anon
+
+                # everything else requires authentication:
+                /** = authc
+            </value>
+        </property>
+
+    </bean>
+</beans>
