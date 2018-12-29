@@ -9,26 +9,13 @@
     <meta charset="UTF-8">
     <title>写文章</title>
     <style>
-        .dropdown {
-            position: relative;
-            display: inline-block;
+        .w-e-text-container {
+            height: anto !important; /*!important是重点，因为原div是行内样式设置的高度300px*/
         }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 100px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            padding: 12px 16px;
-
-        }
-        .thumbnail
-        {
-            margin-bottom: 10px;
-        }
-        </style>
+    </style>
     <script type="text/javascript" src="/static/js/jquery-2.1.4.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/wangEditor.css">
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 </head>
 <body>
@@ -41,7 +28,7 @@
                 <!-- 按钮触发模态框 -->
                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#postModal">发布</button>
                 <!-- 模态框（Modal） -->
-                <div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -64,13 +51,10 @@
             </li>
         </ul>
     </div>
-    <div id="editor" style="width: 60%;margin: auto;">
+    <div id="editor">
         <h4>请输入标题</h4>
         <p>请输入正文</p>
     </div>
-    <button id="editorSetBtn">设置内容</button>
-    <button id="editorGetBtn1">获取内容1</button>
-    <button id="editorGetBtn2">获取内容2</button>
     <!-- 注意， 只需要引用 JS，无需引用任何 CSS ！！！-->
     <script type="text/javascript" src="/static/js/wangEditor.js"></script>
     <script type="text/javascript">
@@ -122,21 +106,16 @@
             }
         }
         editor.create()
-        $("#editorSetBtn").click(function(){
-            //这是设置编辑器内容
-            editor.txt.html("dsafdfadsfdafdsfds");
-        })
-        $("#editorGetBtn1").click(function(){
-            //获取编辑器的内容，带样式
-            //一般使用这个获取数据，通过ajax发送给服务端　，然后服务端以Ｓtring接收，保存到数据库．
-            alert(editor.txt.html());
-        })
-        $("#editorGetBtn2").click(function(){
-            //获取编辑器的内容，不带样式，纯文本
-            alert(editor.txt.text());
-        })
         //getBoardTag
         $(document).ready(function(){
+            $('#editor').css({
+                "width":"60%",
+                "height":"700px",
+                "margin":"auto"
+            });
+            $(".w-e-text-container").css({
+                "height":"700px"
+            })
             $.ajax({
                 url:"/board/listAllBoardName",
                 type:"POST",
@@ -147,6 +126,7 @@
             $("#postButton").click(function () {
                 postArticle();
                 tag=undefined;
+                $("#articleTitle").attr("value","");
             })
         });
 
@@ -169,11 +149,27 @@
                     row=$("<div class='row'></div>").append($("<br>"))
                 }
             }
+            var titleInput="<br><br><div style='margin:3px'>\n" +
+                "\t\t\t\t<div class=\"input-group\">\n" +
+                "\t\t\t\t\t<span class=\"input-group-btn\">\n" +
+                "\t\t\t\t\t\t<button class=\"btn btn-default\" type=\"button\">\n" +
+                "\t\t\t\t\t\t\t文章标题\n" +
+                "\t\t\t\t\t\t</button>\n" +
+                "\t\t\t\t\t</span>\n" +
+                "\t\t\t\t\t<input id='articleTitle' type=\"text\" class=\"form-control\">\n" +
+                "\t\t\t\t</div><!-- /input-group -->\n" +
+                "\t\t\t</div><!-- /.col-lg-6 --><br>"
+            boardTagContains.append($(titleInput)).append("<span style=\"background-image: url(/static/images/upload.jpg)\">上传图片<span>")
         }
 
         function postArticle() {
+            var articleTitle = $("#articleTitle").val();
             if(typeof(tag)=="undefined"){
                 alert("请选择分类标签");
+                return;
+            }
+            if(articleTitle==""||articleTitle==null){
+                alert("请添加标题");
                 return;
             }
             var htmlContent = editor.txt.html();
@@ -184,15 +180,25 @@
             if(matchers!=null)
                 degest=matchers[0];
             var userName = $("#userName").text();
-            var postData = "userName="+userName+"&content="+htmlContent+
-                    "&contentSummary="+degest+"&boardTag="+tag;
+            // var postData = "userName="+userName+"&content="+htmlContent+
+            //         "&contentSummary="+degest+"&boardTag="+tag;
+
+            var postData = {
+                userName:userName,
+                content:htmlContent,
+                contentSummary:degest,
+                boardTag:tag,
+                title:articleTitle
+            }
             $.ajax({
                 url:"/post/add",
                 type:"POST",
-                data:postData,
+                contentType:"application/json;charset=utf-8",
+                data:JSON.stringify(postData),
+                dataType:'json',
                 success:function (result) {
-                    if(result.code=100){
-                        $("＃postModal").modal('hide');
+                    if(result.code==100){
+                        alert("保存成功")
                     }else{
                         alert("发布失败，请重试!!!")
                     }

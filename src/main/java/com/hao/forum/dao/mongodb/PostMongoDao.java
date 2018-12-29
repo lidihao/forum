@@ -2,6 +2,7 @@ package com.hao.forum.dao.mongodb;
 
 import com.github.pagehelper.Page;
 import com.hao.forum.entity.Post;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -13,32 +14,36 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class PostMongoDao {
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    protected Page<Post> queryPostPagable(int pageIndex,int pageSize,Query query){
-        if (pageIndex<=0)
-            pageIndex = 1;
-
-        Page<Post> page = new Page<>();
-        int count = (int) mongoTemplate.count(query,"post");
-        int pageNum = Math.round((float)count/pageSize);
-        if(pageIndex>pageNum)
-            pageIndex = pageNum;
-        page.setTotal(count);
-        page.setPages(pageNum);
-        page.setPageNum(pageIndex).setPageSize(pageSize);
-        List<Post> postList = mongoTemplate.find(query,Post.class);
-        page.addAll(postList);
-        return page;
-    }
-
+public class PostMongoDao extends BaseMongoDao<Post> {
     public Page<Post> queryPostPagableOrderBy(int pageIndex, int pageSize, Sort.Order... orders){
-        Query query =new Query(Criteria.where("isDeleted").is(0));
+        Query query =new Query(Criteria.where("isDeleted").is(false));//查找没有被删除的帖子
         query.fields().exclude("content").exclude("attachments").exclude("comments");
         query.with(new PageRequest(pageIndex,pageSize));
         query.with(new Sort(orders));
-        return queryPostPagable(pageIndex,pageSize,query);
+        return queryPostPagable(pageIndex,pageSize,query,"post",Post.class);
+    }
+    public void insertPost(Post post){
+        mongoTemplate.insert(post);
+    }
+
+    protected List<Post> getPostByQuery(Query query){
+        return mongoTemplate.find(query,Post.class,"post");
+    }
+    public Post getPostById(String postId){
+        Query query = new Query(Criteria.where("id").is(postId));
+        query.fields().exclude("contentSummary");
+        List<Post> postList= getPostByQuery(query);
+        if(postList!=null){
+            return postList.get(0);
+        }else {
+            return null;
+        }
+    }
+    public Page<Post> listPostByBoardName(int pageIndex, int pageSize,String boardName,Sort.Order... orders){
+        Query query =new Query(Criteria.where("boardTag").is(boardName));
+        query.fields().exclude("content").exclude("attachments").exclude("comments");
+        query.with(new PageRequest(pageIndex,pageSize));
+        query.with(new Sort(orders));
+        return queryPostPagable(pageIndex,pageSize,query,"post",Post.class);
     }
 }

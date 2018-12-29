@@ -22,9 +22,9 @@ public class UserService {
     private UserDao userDao;
     public Msg doRegister(User user){
         Msg msg=null;
-        String salt = DigestUtils.md5Hex(new Date().toString()+user.getUserName());
+        String salt = DigestUtils.md5Hex(new Date().toString()+user.getUserName());//生成salt值
         SimpleHash hash = new SimpleHash(SysConstant.HASH_ALGORITHM_NAME,user.getPassWord(),
-                ByteSource.Util.bytes(salt),SysConstant.HASH_TIMES);
+                ByteSource.Util.bytes(salt),SysConstant.HASH_TIMES);//对密码进行hash
         user.setPassWord(hash.toHex());
         user.setSalt(salt);
         try {

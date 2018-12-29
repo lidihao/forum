@@ -30,12 +30,18 @@
 
     <!--&lt;!&ndash; Spring配置文件的核心点（数据源、与mybatis的整合，事务控制） &ndash;&gt;-->
 
+    <bean id="formAuthenticationFilter" class="com.hao.forum.filter.AjaxFormAuthenticationFilter">
+    </bean>
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager"/>
         <property name="loginUrl" value="/login.jsp"/>
         <property name="successUrl" value="/index"/>
         <property name="unauthorizedUrl" value="/403.html"/>
-
+        <property name="filters">
+            <map>
+                <entry key="authc" value-ref="formAuthenticationFilter"/>
+            </map>
+        </property>
         <property name="filterChainDefinitions">
             <value>
                 / = anon
@@ -45,10 +51,14 @@
                 /register.jsp = anon
                 /user/register = anon
                 /static/** = anon
-                /admin/** = authc,roles[admin]
                 /index = anon
+                /post/get/**=anon
+                /post/list/** = anon
+                /board/list*/**=anon
+                /listpostbytag*/**=anon
+                /comment/**=anon
 
-                # everything else requires authentication:
+                /admin/** = authc,roles[admin]
                 /** = authc
             </value>
         </property>

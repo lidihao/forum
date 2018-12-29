@@ -9,12 +9,15 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
-    <context:property-placeholder location="classpath:dbconfig.properties,
-                                    classpath:redis.properties,classpath:mongo.properties" />
+    <context:property-placeholder location="classpath:config/dbconfig.properties,
+                                    classpath:config/redis.properties,
+                                    classpath:config/mongo.properties,
+                                    classpath:config/lucene.properties" />
 
     <import resource="ShiroConfig.xml"/>
     <import resource="mongoConfig.xml"/>
     <import resource="redisConfig.xml"/>
+    <import resource="luceneConfig.xml"/>
     <context:component-scan base-package="com.hao.forum">
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.stereotype.Controller" />

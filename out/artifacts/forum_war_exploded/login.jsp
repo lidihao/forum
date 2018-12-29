@@ -13,7 +13,7 @@
 <div id="box"></div>
 <div class="cent-box">
 	<div class="cent-box-header">
-		<h1 class="main-title hide">论坛</h1>
+		<h2 class="main-title">论坛登录</h2>
 	</div>
 
 	<div class="cont-main clearfix">

@@ -14,8 +14,7 @@
 <div id="box"></div>
 <div class="cent-box register-box">
 	<div class="cent-box-header">
-		<h1 class="main-title hide">论坛</h1>
-		<h2 class="sub-title">生活热爱分享</h2>
+		<h2 class="main-title">论坛注册</h2>
 	</div>
 
 	<div class="cont-main clearfix">

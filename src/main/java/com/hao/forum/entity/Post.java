@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Post extends BaseEntity {
-    private Long PostId;
+    private String id;
     private Date postDate = new Date();
     private String content;
     private String contentSummary;
@@ -18,17 +18,17 @@ public class Post extends BaseEntity {
     private Long vistCount;
     private Long commentCount;
     private String boardTag;
+    private String title;
 
     public Post() {
     }
 
-    public Long getPostId() {
-        return PostId;
+    public String getId() {
+        return id;
     }
 
-    public Post setPostId(Long postId) {
-        PostId = postId;
-        return this;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Date getPostDate() {
@@ -115,5 +115,13 @@ public class Post extends BaseEntity {
 
     public void setBoardTag(String boardTag) {
         this.boardTag = boardTag;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

@@ -5,21 +5,22 @@ import com.hao.forum.common.BaseEntity;
 import java.util.Date;
 
 public class Comment extends BaseEntity {
-    private Long commentID;
-    private Date commentDate;
+    private String id;
+    private Date commentDate=new Date();
     private String commentContent;
-    private boolean isDeleted;
+    private boolean isDeleted=false;
     private String userName;
+    private String postId;
+
     public Comment() {
     }
 
-    public Long getCommentID() {
-        return commentID;
+    public String getId() {
+        return id;
     }
 
-    public Comment setCommentID(Long commentID) {
-        this.commentID = commentID;
-        return this;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Date getCommentDate() {
@@ -56,5 +57,13 @@ public class Comment extends BaseEntity {
     public Comment setUserName(String userName) {
         this.userName = userName;
         return this;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 }
